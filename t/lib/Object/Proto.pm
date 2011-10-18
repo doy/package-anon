@@ -18,9 +18,9 @@ sub new_instance {
 
     if ($proto) {
         my $stash = $proto->{__prototype__};
-        for my $inherited (keys %{ $stash }) {
-            next if exists $s->{$inherited};
-            $s->{$inherited} = $stash->{$inherited};
+        for my $inherited (map { "&$_" } $stash->list_all_symbols('CODE')) {
+            next if $s->has_symbol($inherited);
+            $s->add_symbol($inherited => $stash->get_symbol($inherited));
         }
     }
 

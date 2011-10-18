@@ -29,14 +29,19 @@ _new_anon_stash (klass, name=NULL)
 
     hv_name_set(stash, namestr, len, 0);
     obj = newRV_noinc((SV *)stash);
-    sv_bless(obj, ourstash);
 
     mPUSHs(obj);
 
 void
-bless (stash, rv)
-    SV *stash
+bless (self, rv)
+    SV *self
     SV *rv
+  PREINIT:
+    SV **stash;
   PPCODE:
-    sv_bless(rv, (HV *)SvRV(stash));
+    stash = hv_fetchs((HV*)SvRV(self), "anon_namespace", 0);
+    if (!stash) {
+        croak("couldn't get stash");
+    }
+    sv_bless(rv, (HV *)SvRV(*stash));
     PUSHs(rv);
